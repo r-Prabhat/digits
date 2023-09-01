@@ -1,5 +1,5 @@
 # Import datasets, classifiers and performance metrics\
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 from sklearn import datasets, metrics, svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
@@ -83,3 +83,4 @@ def predict_and_eval(model, X_test, y_test):
 
     print("Classification report rebuilt from confusion matrix:\n"
           f"{classification_report(y_true, y_pred)}\n")
+    return predicted
