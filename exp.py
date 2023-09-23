@@ -124,3 +124,5 @@ print(
     "Classification report rebuilt from confusion matrix:\n"
     f"{metrics.classification_report(y_true, y_pred)}\n"
 )
+print(f"Total number of samples: {len(X)}")
+print(f"Size of Image : {X[0].shape}")
