@@ -22,4 +22,5 @@ jobs:
         run: pip3 install --no-cache-dir -r requirements.txt
       - name: Run experiment
         run: python exp.py
+        - name: Run new experiment
         run: echo "added new print statement"
