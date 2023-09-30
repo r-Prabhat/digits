@@ -1,9 +1,11 @@
-# Import datasets, classifiers and performance metrics\
+# Import datasets, classifiers and performance metrics
 import matplotlib.pyplot as plt
+
 from sklearn import datasets, metrics, svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
-
+import itertools
+from itertools import product
 
 def read_digits():
     data = datasets.load_digits()
@@ -49,38 +51,24 @@ def split_train_dev_test(X, y, test_size, dev_size):
     
     return X_train, X_test, X_dev, y_train, y_test, y_dev
 
-def predict_and_eval(model, X_test, y_test):
+def p_and_eval(model, X_test, y_test):
     # Predict the values using the model
-    predicted = model.predict(X_test)
+    predicted = model.predict(X_test)    
+    return metrics.accuracy_score(y_test, predicted)
 
-    # Visualize the first 4 test samples and show their predicted digit value in the title.
-    _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-    for ax, image, prediction in zip(axes, X_test[:4], predicted[:4]):
-        ax.set_axis_off()
-        image = image.reshape(8, 8)
-        ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
-        ax.set_title(f"Prediction: {prediction}")
+# Function for hyperparameter tunning
+def hparams_tune(X_train, X_dev, y_train, y_dev, params):
+    best_accur_sofar = -1
 
-    plt.show()
+    all_comb = list(itertools.product(params['gammas'], params['cparams']))
+    for gc in all_comb:
+        cur_model = train_model(X_train, y_train, {'gamma': gc[0], 'C' : gc[1]}, model_type='svm')
+        # Predict the value of the digit on the test subset
+        cur_accuracy = p_and_eval(cur_model, X_dev, y_dev)
 
-    # Print the classification report
-    print(f"Classification report for classifier {model}:\n{classification_report(y_test, predicted)}\n")
+        if cur_accuracy > best_accur_sofar:
+            best_accur_sofar = cur_accuracy
+            best_hparam = gc  
+            best_model = cur_model
 
-    # Plot the confusion matrix
-    disp = ConfusionMatrixDisplay.from_estimator(model, X_test, y_test)
-    disp.figure_.suptitle("Confusion Matrix")
-    print(f"Confusion matrix:\n{disp.confusion_matrix}\n")
-
-    # Rebuild the classification report from the confusion matrix
-    y_true = []
-    y_pred = []
-    cm = disp.confusion_matrix
-
-    for gt in range(len(cm)):
-        for pred in range(len(cm)):
-            y_true += [gt] * cm[gt][pred]
-            y_pred += [pred] * cm[gt][pred]
-
-    print("Classification report rebuilt from confusion matrix:\n"
-          f"{classification_report(y_true, y_pred)}\n")
-    return predicted
+    return best_hparam, best_model, best_accur_sofar
