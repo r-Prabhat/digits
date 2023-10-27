@@ -52,41 +52,24 @@ def split_train_dev_test(X, y, test_size, dev_size):
 def predict_and_eval(model, X_test, y_test):
     # Predict the values using the model
     predicted = model.predict(X_test)
+    acc = metrics.accuracy_score(y_test, predicted)
+    return acc
+
+def tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combinations):
+    best_accuracy = -1
+    for h_params in h_params_combinations:
+        # 5. Model training
+        model = train_model(X_train, y_train, h_params, model_type="svm")
+        # Predict the value of the digit on the test subset        
+        cur_accuracy = predict_and_eval(model, X_dev, y_dev)
+        if cur_accuracy > best_accuracy:
+            best_accuracy = cur_accuracy
+            best_hparams = h_params
+            best_model = model
+
+    return best_hparams, best_model, best_accuracy 
+
     
-    return print(metrics.accuracy_score(y_test, predicted))
-
-    # # Visualize the first 4 test samples and show their predicted digit value in the title.
-    # _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-    # for ax, image, prediction in zip(axes, X_test[:4], predicted[:4]):
-    #     ax.set_axis_off()
-    #     image = image.reshape(8, 8)
-    #     ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
-    #     ax.set_title(f"Prediction: {prediction}")
-
-    # plt.show()
-
-    # # Print the classification report
-    # print(f"Classification report for classifier {model}:\n{classification_report(y_test, predicted)}\n")
-
-    # # Plot the confusion matrix
-    # disp = ConfusionMatrixDisplay.from_estimator(model, X_test, y_test)
-    # disp.figure_.suptitle("Confusion Matrix")
-    # print(f"Confusion matrix:\n{disp.confusion_matrix}\n")
-
-    # # Rebuild the classification report from the confusion matrix
-    # y_true = []
-    # y_pred = []
-    # cm = disp.confusion_matrix
-
-    # for gt in range(len(cm)):
-    #     for pred in range(len(cm)):
-    #         y_true += [gt] * cm[gt][pred]
-    #         y_pred += [pred] * cm[gt][pred]
-
-    # print("Classification report rebuilt from confusion matrix:\n"
-    #       f"{classification_report(y_true, y_pred)}\n")
-    # return predicted
-
 def get_combinations(param_name, param_values, base_combinations):    
     new_combinations = []
     for value in param_values:
