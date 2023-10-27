@@ -53,7 +53,7 @@ def predict_and_eval(model, X_test, y_test):
     # Predict the values using the model
     predicted = model.predict(X_test)
     
-    return metrics.accuracy_score(y_test, predicted)
+    return print(metrics.accuracy_score(y_test, predicted))
 
     # # Visualize the first 4 test samples and show their predicted digit value in the title.
     # _, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
@@ -86,3 +86,17 @@ def predict_and_eval(model, X_test, y_test):
     # print("Classification report rebuilt from confusion matrix:\n"
     #       f"{classification_report(y_true, y_pred)}\n")
     # return predicted
+
+def get_combinations(param_name, param_values, base_combinations):    
+    new_combinations = []
+    for value in param_values:
+        for combination in base_combinations:
+            combination[param_name] = value
+            new_combinations.append(combination.copy())    
+    return new_combinations
+
+def get_hyperparameter_combinations(dict_of_param_lists):    
+    base_combinations = [{}]
+    for param_name, param_values in dict_of_param_lists.items():
+        base_combinations = get_combinations(param_name, param_values, base_combinations)
+    return base_combinations
