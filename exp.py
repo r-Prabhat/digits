@@ -59,5 +59,4 @@ for test_size in test_sizes:
         test_acc = predict_and_eval(best_model, X_test, y_test)
         train_acc = predict_and_eval(best_model, X_train, y_train)
         dev_acc = best_accuracy
-        .
         print("test_size={:.2f} dev_size={:.2f} train_size={:.2f} train_acc={:.2f} dev_acc={:.2f} test_acc={:.2f}".format(test_size, dev_size, train_size, train_acc, dev_acc, test_acc))
