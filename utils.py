@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn import datasets, metrics, svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
-
+from joblib import dump, load
 
 def read_digits():
     data = datasets.load_digits()
@@ -57,6 +57,7 @@ def predict_and_eval(model, X_test, y_test):
 
 def tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combinations):
     best_accuracy = -1
+    best_model_path = ""
     for h_params in h_params_combinations:
         # 5. Model training
         model = train_model(X_train, y_train, h_params, model_type="svm")
@@ -65,9 +66,16 @@ def tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combinations):
         if cur_accuracy > best_accuracy:
             best_accuracy = cur_accuracy
             best_hparams = h_params
+            best_model_path = "./models/best_model"+"_".join(["{}:{}".format(k,v) for k, v in h_params.items()]) + ".joblib"
             best_model = model
+    
+    
+    
+    dump(best_model, best_model_path)
 
-    return best_hparams, best_model, best_accuracy 
+    print("Model save at {}".format(best_model_path))
+    
+    return best_hparams, best_model_path, best_accuracy 
 
     
 def get_combinations(param_name, param_values, base_combinations):    
