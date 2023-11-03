@@ -40,6 +40,7 @@ h_params_tree['max_depth'] = max_depth_list
 h_params_trees_combinations = get_hyperparameter_combinations(h_params_tree)
 classifier_param_dict['tree'] = h_params_trees_combinations
 
+
 results = []
 test_sizes =  [0.2]
 dev_sizes  =  [0.2]
@@ -90,4 +91,4 @@ print("binarized predictions -- normalized over pred  labels")
 print(metrics.confusion_matrix(binary_preds['svm'], binary_preds['tree'], labels=[True, False] , normalize='pred'))
         
 # print(pd.DataFrame(results).groupby('model_type').describe().T)
-      
+                
