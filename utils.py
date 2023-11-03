@@ -34,10 +34,7 @@ def tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combinations, model_ty
     # save the best_model    
     dump(best_model, best_model_path) 
 
-
     return best_hparams, best_model_path, best_accuracy 
-
-
 
 def read_digits():
     digits = datasets.load_digits()
@@ -72,7 +69,7 @@ def train_model(x, y, model_params, model_type="svm"):
     return model
 
 
-def train_test_dev_split(X, y, test_size, dev_size):
+def split_train_dev_test(X, y, test_size, dev_size):
     X_train_dev, X_test, Y_train_Dev, y_test =  split_data(X, y, test_size=test_size, random_state=1)
     print("train+dev = {} test = {}".format(len(Y_train_Dev),len(y_test)))
     
