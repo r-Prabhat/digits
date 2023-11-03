@@ -1,4 +1,4 @@
-from utils import get_hyperparameter_combinations, split_train_dev_test,read_digits, tune_hparams, data_preprocess
+from utils import get_hyperparameter_combinations, split_train_dev_test, read_digits, tune_hparams, preprocess_data
 import os
 def test_for_hparam_cominations_count():
     
@@ -28,8 +28,8 @@ def create_dummy_data():
     X_dev = X[:50,:,:]
     y_dev = y[:50]
 
-    X_train = data_preprocess(X_train)
-    X_dev = data_preprocess(X_dev)
+    X_train = preprocess_data(X_train)
+    X_dev = preprocess_data(X_dev)
 
     return X_train, y_train, X_dev, y_dev
 def test_for_hparam_cominations_values():    
