@@ -10,3 +10,6 @@ RUN pip3 install -r /digits/requirements.txt
 WORKDIR /digits
 # requirements installation
 CMD ["pytest"]
+ENV FLASK_APP=API/hello.py
+CMD ["flask", "run","--host", "0.0.0.0"]
+
