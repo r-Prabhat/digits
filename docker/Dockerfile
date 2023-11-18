@@ -9,7 +9,12 @@ RUN pip3 install -r /digits/requirements.txt
 # no need for conda or venv
 WORKDIR /digits
 # requirements installation
-CMD ["pytest"]
-ENV FLASK_APP=API/hello.py
-CMD ["flask", "run","--host", "0.0.0.0"]
+
+ENV FLASK_APP=API/digit_prediction
+
+EXPOSE 80
+
+CMD ["flask", "run", "--host=0.0.0.0","--port=80"]
+
+
 
