@@ -4,9 +4,6 @@ from sklearn import svm
 from joblib import load
 app = Flask(__name__)
 
-# @app.route("/<name>")
-# def hello_world(name):
-#     return "<p>Hello, World</p>"
 
 @app.route('/predict', methods=['POST'])
 def compare_digits():
