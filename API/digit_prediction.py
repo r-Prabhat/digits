@@ -15,14 +15,14 @@ def compare_digits():
         model = load('./models/svm_gamma:0.0005_C:10.joblib')
         data = request.get_json()  # Parse JSON data from the request body
         image1 = data.get('image1', [])
-        image2 = data.get('image2', [])
+        # image2 = data.get('image2', [])
 
         # Preprocess the images and make predictions
         digit1 = predict_digit(image1)
-        digit2 = predict_digit(image2)
+        # digit2 = predict_digit(image2)
 
         # Compare the predicted digits and return the result
-        result = digit1 == digit2
+        result == digit1 
 
         return jsonify({'result': result})
     except Exception as e:
@@ -31,10 +31,10 @@ def compare_digits():
 def predict_digit(image):
     try:
         # Convert the input list to a numpy array and preprocess for prediction
-        img_array = np.array(image, dtype=np.float32).reshape(1, 28, 28, 1) / 255.0
+        img_array = np.array(image, dtype=np.float32).reshape(1, -1)
 
         prediction = model.predict(img_array)
-        digit = np.argmax(prediction)
+        digit = int(prediction[0])
 
         return digit
     except Exception as e:
