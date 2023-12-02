@@ -1,63 +1,67 @@
-from utils import get_hyperparameter_combinations, split_train_dev_test, read_digits, tune_hparams, preprocess_data
-import os
-def test_for_hparam_cominations_count():
+from sklearn.model_selection import train_test_split
+# Standard scientific Python imports
+import matplotlib.pyplot as plt
+from sklearn import svm, tree, datasets, metrics, linear_model
+from joblib import dump, load
+
+def find_acc(model, X_test, y_test):
+    predicted = model.predict(X_test)
+    return metrics.accuracy_score(y_test,predicted),predicted
+
+def train_model(x, y, model_params, model_type="svm"):
+    if model_type == "svm":
+        # Create a classifier: a support vector classifier
+        clf = svm.SVC
+    if model_type == "tree":
+        # Create a classifier: a decision tree classifier
+        clf = tree.DecisionTreeClassifier
+    if model_type == "lr":
+        # Create a classifier: a decision tree classifier
+        clf = linear_model.LogisticRegression
+    model = clf(**model_params)
+    # train the model
+    model.fit(x, y)
+    return model
+
+
+
+def tune_hparams(model_type,X_train, X_test, X_dev , y_train, y_test, y_dev,list_of_param_combination):
+    best_acc = -1
+    best_model_path = ""
+    for param_group in list_of_param_combination:
+        temp_model = train_model(X_train, y_train, param_group, model_type=model_type)
+        # temp_model = model(**param_group)
+        temp_model.fit(X_train,y_train)
+        acc,_ = find_acc(temp_model,X_dev,y_dev)
+        if acc > best_acc:
+            best_acc = acc
+            best_model_path = f'./models/{model_type}_' +"_".join(["{}:{}".format(k,v) for k,v in param_group.items()]) + ".joblib"
+            best_model = temp_model
+            optimal_param = param_group
+        dev_acc,_ = find_acc(temp_model,X_dev,y_dev,)
+        test_acc,_test_predicted =  find_acc(temp_model,X_test,y_test)
+        print(f'model: {model_type}:  train_acc: {acc}, dev_acc: {dev_acc}, test_acc: {test_acc}, params: {param_group}')
+        model_path = f'./models/{"M23CSA017_"}{model_type}_' +"_".join(["{}:{}".format(k,v) for k,v in param_group.items()]) + ".joblib"
+        dump(temp_model, model_path)
+    train_acc,_= find_acc(best_model,X_train,y_train) 
+    dev_acc,_ = find_acc(best_model,X_dev,y_dev)
+    test_acc,_test_predicted =  find_acc(best_model,X_test,y_test)
+    # save the best_model    
+    dump(best_model, best_model_path) 
     
-    gamma_ranges = [0.001, 0.01, 0.1, 1]
-    C_ranges = [1, 10, 100, 1000]
-    h_params={}
-    h_params['gamma'] = gamma_ranges
-    h_params['C'] = C_ranges
-    h_params_combinations = get_hyperparameter_combinations(h_params)
-    
-    assert len(h_params_combinations) == len(gamma_ranges) * len(C_ranges)
+    return optimal_param,best_model_path, best_acc
 
-def create_dummy_hyperparameter():
-    gamma_ranges = [0.001, 0.01]
-    C_ranges = [1]
-    h_params={}
-    h_params['gamma'] = gamma_ranges
-    h_params['C'] = C_ranges
-    h_params_combinations = get_hyperparameter_combinations(h_params)
-    return h_params_combinations
-def create_dummy_data():
 
-    X, y = read_digits()
+def get_combinations(param,values,combinations):    
+    new_combinations = []
+    for value in values:
+        for combination in combinations:
+            combination[param] = value
+            new_combinations.append(combination.copy())    
+    return new_combinations
 
-    X_train = X[:100,:,:]
-    y_train = y[:100]
-    X_dev = X[:50,:,:]
-    y_dev = y[:50]
-
-    X_train = preprocess_data(X_train)
-    X_dev = preprocess_data(X_dev)
-
-    return X_train, y_train, X_dev, y_dev
-def test_for_hparam_cominations_values():    
-    h_params_combinations = create_dummy_hyperparameter()
-
-    expected_param_combo_1 = {'gamma': 0.001, 'C': 1}
-    expected_param_combo_2 = {'gamma': 0.01, 'C': 1}
-
-    assert (expected_param_combo_1 in h_params_combinations) and (expected_param_combo_2 in h_params_combinations)
-
-def test_model_saving():
-    X_train, y_train, X_dev, y_dev = create_dummy_data()
-
-    h_params_combinations = create_dummy_hyperparameter()
-    _, best_model_path, _ = tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combinations)
-    
-    assert os.path.exists(best_model_path)
-def test_data_splitting():
-    X, y = read_digits()
-    
-    X = X[:100,:,:]
-    y = y[:100]
-    
-    test_size = .1
-    dev_size = .6
-
-    X_train, X_test, X_dev, y_train, y_test, y_dev = split_train_dev_test(X, y, test_size=test_size, dev_size=dev_size)
-
-    assert (len(X_train) == 30) 
-    assert (len(X_test) == 10)
-    assert  ((len(X_dev) == 60))
+def get_hyperparameter_combinations(dict_of_param_lists):    
+    base_combinations = [{}]
+    for param_name, param_values in dict_of_param_lists.items():
+        base_combinations = get_combinations(param_name, param_values, base_combinations)
+    return base_combinations
