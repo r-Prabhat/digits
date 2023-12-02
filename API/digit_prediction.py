@@ -28,7 +28,7 @@ def compare_digits():
     
 def predict_digit(image):
     try:
-        # Convert the input list to a numpy array and preprocess for prediction
+
         img_array = np.array(image, dtype=np.float32).reshape(1, -1)
 
         prediction = model.predict(img_array)
