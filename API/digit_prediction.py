@@ -17,7 +17,7 @@ def compare_digits():
         image1 = data.get('image1', [])
         # image2 = data.get('image2', [])
 
-        # Preprocess the images and make predictions.
+        # Preprocess the images and make predictions
         digit1 = predict_digit(image1)
         # digit2 = predict_digit(image2)
 
